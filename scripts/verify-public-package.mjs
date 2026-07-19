@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const allowedExtensions = new Set(["", ".html", ".css", ".js", ".mjs", ".md", ".cff", ".json", ".yml"]);
+const allowedExtensions = new Set(["", ".html", ".css", ".js", ".mjs", ".md", ".cff", ".json", ".yml", ".toml", ".sql", ".ts"]);
 const allowedPaths = new Set([
   ".github/workflows/public-boundary.yml",
   ".gitignore",
@@ -21,8 +21,13 @@ const allowedPaths = new Set([
   "PRIVACY.md",
   "PUBLICATION_BOUNDARY.md",
   "README.md",
+  "runtime-config.js",
   "scripts/verify-public-package.mjs",
-  "styles.css"
+  "styles.css",
+  "SUBMISSION_DEPLOYMENT.md",
+  "supabase/config.toml",
+  "supabase/functions/submit-annotations/index.ts",
+  "supabase/migrations/202607190001_create_human_annotation_submissions.sql"
 ]);
 const forbiddenNames = new Set([
   ".env",
@@ -46,6 +51,7 @@ function listFiles(directory) {
   const files = [];
   for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
     if (entry.name === ".git") continue;
+    if (entry.name === ".temp" && path.basename(directory) === "supabase") continue;
     if (forbiddenNames.has(entry.name)) {
       throw new Error(`Forbidden path name: ${entry.name}`);
     }
@@ -92,6 +98,7 @@ const manifest = {
   containsModelPredictions: false,
   containsCoreCode: false,
   containsCredentials: false,
+  containsStoredResponses: false,
   files: manifestFiles
 };
 const pilotSource = fs.readFileSync(path.join(root, "pilot-items.js"), "utf8");
@@ -122,12 +129,63 @@ for (const required of [
   "consentForm",
   "decisionGrid",
   "confidenceGrid",
-  "exportButton"
+  "exportButton",
+  "runtime-config.js",
+  "submissionForm",
+  "remoteConsentCheck",
+  "submitResultsButton"
 ]) {
   if (!html.includes(required)) throw new Error(`Missing site contract: ${required}`);
 }
 if (/https?:\/\//i.test(html)) {
-  throw new Error("The static annotation page must not call an external URL.");
+  throw new Error("External URLs must be isolated in the reviewed runtime configuration.");
+}
+
+const runtimeSource = fs.readFileSync(path.join(root, "runtime-config.js"), "utf8");
+const runtimeSandbox = { window: {} };
+vm.runInNewContext(runtimeSource, runtimeSandbox, { filename: "runtime-config.js" });
+const runtime = runtimeSandbox.window.ALFA_PUBLIC_RUNTIME;
+if (!runtime || runtime.schemaVersion !== "alfa_public_runtime_config_v1") {
+  throw new Error("Runtime configuration schema is missing or invalid.");
+}
+if (runtime.submissionEnabled === true) {
+  if (!/^https:\/\/[a-z0-9]{20}\.supabase\.co\/functions\/v1\/submit-annotations$/.test(runtime.submissionEndpoint)) {
+    throw new Error("Enabled submission endpoint is not an approved Supabase function URL.");
+  }
+} else if (runtime.submissionEndpoint !== "") {
+  throw new Error("Disabled submission must not retain an endpoint.");
+}
+
+const functionSource = fs.readFileSync(
+  path.join(root, "supabase/functions/submit-annotations/index.ts"),
+  "utf8"
+);
+for (const required of [
+  "ALFA_STUDY_ACCESS_CODE",
+  "MAX_BODY_BYTES",
+  "constantTimeEqual",
+  "INVALID_STUDY_ACCESS",
+  "BLINDING_CONTRACT_BROKEN",
+  "INCOMPLETE_SUBMISSION",
+  "ignoreDuplicates: true",
+  "https://yusufcanaltinkaynak55-cloud.github.io"
+]) {
+  if (!functionSource.includes(required)) throw new Error(`Missing submission security contract: ${required}`);
+}
+const migrationSource = fs.readFileSync(
+  path.join(root, "supabase/migrations/202607190001_create_human_annotation_submissions.sql"),
+  "utf8"
+);
+for (const required of [
+  "enable row level security",
+  "revoke all on table public.human_annotation_submissions from anon, authenticated",
+  "grant all on table public.human_annotation_submissions to service_role",
+  "submission_id uuid not null unique",
+  "completed_count integer not null check (completed_count = 20)"
+]) {
+  if (!migrationSource.toLowerCase().includes(required.toLowerCase())) {
+    throw new Error(`Missing database security contract: ${required}`);
+  }
 }
 fs.writeFileSync(
   path.join(root, "PUBLICATION_MANIFEST.json"),

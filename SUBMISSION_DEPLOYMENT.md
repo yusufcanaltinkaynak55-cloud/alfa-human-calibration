@@ -1,0 +1,53 @@
+# Secure submission deployment / Güvenli gönderim kurulumu
+
+This document contains no credentials. Secrets must be entered only through the
+Supabase secret manager and must never be committed to Git.
+
+Bu belge kimlik bilgisi içermez. Gizli değerler yalnız Supabase gizli değer
+yöneticisine girilmeli ve hiçbir zaman Git'e eklenmemelidir.
+
+## Architecture / Mimari
+
+- GitHub Pages serves the static bilingual annotation interface.
+- `submit-annotations` is the only public write endpoint.
+- The function accepts requests only from the published site (and local
+  development origins), requires a coordinator-provided study access code and
+  validates the complete 20-item payload again on the server.
+- The database table has Row Level Security enabled and grants no access to
+  anonymous or authenticated browser roles.
+- A backend-only Supabase secret key performs the insert.
+- The application table contains no IP-address or user-agent column.
+- Repeating the same `submissionId` returns the original receipt instead of
+  creating a duplicate row.
+
+## Required hosted secret / Gerekli barındırılan gizli değer
+
+`ALFA_STUDY_ACCESS_CODE`
+
+Use a long, random pilot-specific value and share it only with intended
+annotators. Do not put it in `runtime-config.js`, the repository, screenshots,
+messages or URLs.
+
+Uzun ve bu pilota özel rastgele bir değer kullanın; yalnız hedef anotörlerle
+paylaşın. Bu değeri `runtime-config.js` içine, depoya, ekran görüntülerine,
+mesajlara veya URL'lere koymayın.
+
+## Deployment order / Kurulum sırası
+
+1. Create a separate Supabase project dedicated to this public pilot.
+2. Link this public repository directory to that project.
+3. Apply the migration in `supabase/migrations`.
+4. Set `ALFA_STUDY_ACCESS_CODE` through Supabase secrets.
+5. Deploy `submit-annotations` with JWT verification disabled as declared in
+   `supabase/config.toml`.
+6. Put only the public function endpoint in `runtime-config.js` and change
+   `submissionEnabled` to `true`.
+7. Run `node scripts/verify-public-package.mjs`.
+8. Test invalid origin, invalid access code, incomplete payload, successful
+   submission, duplicate retry and database invisibility from a browser key.
+
+The Supabase project URL and function endpoint are public identifiers, not
+credentials. Secret or service-role keys are never added to the frontend.
+
+Supabase proje URL'si ve işlev adresi kamusal tanımlayıcılardır; kimlik bilgisi
+değildir. Secret veya service-role anahtarları hiçbir zaman ön yüze eklenmez.
