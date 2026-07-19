@@ -1,21 +1,22 @@
 # ALFA Human Calibration / İnsan Kalibrasyonu
 
-Independent, bilingual and blind human-annotation interface for experimental
-document-level semantic classes.
+Independent, bilingual and blind human-annotation interface with a 150-item
+development calibration bank delivered as three sequential 50-item blocks.
 
-Deneysel belge düzeyi semantik sınıflar için bağımsız, iki dilli ve kör insan
-anotasyonu arayüzüdür.
+Deneysel belge düzeyi semantik sınıflar için 150 maddelik geliştirme
+kalibrasyon bankasını üç ardışık 50'lik bölüm halinde sunan bağımsız, iki dilli
+ve kör insan anotasyonu arayüzüdür.
 
 ## Scope / Kapsam
 
 This repository contains only the public annotation interface, an unlabeled
-pilot package, the task protocol, local JSON export and the isolated submission
+150-item development bank, the task protocol, block-level local JSON export and the isolated submission
 endpoint source. It does not contain the ALFA core, private datasets, model
 predictions, thresholds, formulas, API credentials, stored responses or
 internal reports.
 
-Bu depo yalnız kamusal anotasyon arayüzünü, etiketsiz pilot paketi, görev
-protokolünü, yerel JSON dışa aktarımını ve yalıtılmış gönderim uç noktası
+Bu depo yalnız kamusal anotasyon arayüzünü, etiketsiz 150 maddelik geliştirme
+bankasını, görev protokolünü, bölüm düzeyi yerel JSON dışa aktarımını ve yalıtılmış gönderim uç noktası
 kaynağını içerir. ALFA çekirdeğini, özel veri kümelerini, model tahminlerini,
 eşikleri, formülleri, API bilgilerini, saklanan yanıtları veya dahili raporları
 içermez.
@@ -23,14 +24,14 @@ içermez.
 ## Privacy / Gizlilik
 
 Draft progress remains in the participant's browser. Nothing is transmitted
-while answering. After completing all items, the participant may explicitly
-consent and submit the pseudonymous annotation record to an isolated research
-database, or keep using local JSON export.
+while answering. Each completed 50-item block requires a separate explicit
+submission action and receives its own receipt. The participant may pause
+between blocks or use block-level local JSON export.
 
 Taslak ilerleme katılımcının tarayıcısında kalır. Yanıtlama sırasında hiçbir
-veri iletilmez. Tüm öğeler tamamlandıktan sonra katılımcı açıkça onay verip
-takma adlı anotasyon kaydını yalıtılmış araştırma veritabanına gönderebilir veya
-yerel JSON dışa aktarımını kullanabilir.
+veri iletilmez. Tamamlanan her 50 maddelik bölüm ayrı açık gönderim eylemi ve
+ayrı teslim numarası gerektirir. Katılımcı bölümler arasında ara verebilir veya
+bölüm düzeyi yerel JSON dışa aktarımını kullanabilir.
 
 Do not enter names, email addresses, phone numbers or other personal data.
 
@@ -48,10 +49,12 @@ barındırılan gizli değerlerde saklanır.
 
 ## Scientific boundary / Bilimsel sınır
 
-This is a development-pilot collection tool. It does not imply ethics committee
-approval, human calibration, external validation or scientific proof.
+This is a development collection and calibration-design tool. The 150 public
+items are not validated ground truth. It does not imply ethics committee
+approval, completed human calibration, external validation or scientific proof.
 
-Bu araç geliştirme pilotu içindir. Etik kurul onayı, insan kalibrasyonu, dış
+Bu araç geliştirme ve kalibrasyon tasarımı içindir. Açık 150 öğe doğrulanmış
+temel gerçek değildir. Etik kurul onayı, tamamlanmış insan kalibrasyonu, dış
 validasyon veya bilimsel kanıt anlamına gelmez.
 
 See [METHOD.md](METHOD.md), [PRIVACY.md](PRIVACY.md) and

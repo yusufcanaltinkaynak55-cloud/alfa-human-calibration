@@ -1,9 +1,9 @@
 cff-version: 1.2.0
 message: "If you use this annotation protocol, please cite this repository."
-title: "ALFA Human Calibration: Bilingual Blind Annotation Pilot"
+title: "ALFA Human Calibration: 150-Item Bilingual Blind Annotation Bank"
 type: software
 authors:
   - family-names: "Altınkaynak"
     given-names: "Yusuf Can"
-version: 0.1.0
+version: 0.3.0
 date-released: 2026-07-19

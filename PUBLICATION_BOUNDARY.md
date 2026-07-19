@@ -3,7 +3,8 @@
 Public / Kamusal:
 
 - bilingual blind annotation interface / iki dilli kör anotasyon arayüzü
-- unlabeled pilot items / etiketsiz pilot öğeler
+- 150 unlabeled development items in three public blocks / üç açık bölümde 150
+  etiketsiz geliştirme öğesi
 - task definitions and privacy notice / görev tanımları ve gizlilik bildirimi
 - local pseudonymous JSON export / yerel takma adlı JSON dışa aktarımı
 - isolated submission contract, migration and endpoint source / yalıtılmış
@@ -14,6 +15,7 @@ Private / Gizli:
 - ALFA core and internal architecture / ALFA çekirdeği ve dahili mimari
 - formulas, thresholds and calibration profiles / formüller, eşikler ve kalibrasyon profilleri
 - expected labels and model predictions / beklenen etiketler ve model tahminleri
+- private construction-class key / özel tasarım-sınıfı anahtarı
 - private development or test datasets / özel geliştirme ve test veri kümeleri
 - stored response rows and administrative tools / saklanan yanıt satırları ve
   yönetim araçları
