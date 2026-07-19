@@ -6,11 +6,17 @@ const ALLOWED_ORIGINS = new Set([
   "http://127.0.0.1:8000",
   "http://localhost:8000"
 ]);
-const PACKAGE_ID = "PUBLIC-PILOT-TR-EN-001";
-const SCHEMA_VERSION = "alfa_public_bilingual_annotation_export_v1";
-const CONSENT_VERSION = "alfa_remote_submission_consent_v1";
-const MAX_BODY_BYTES = 64 * 1024;
-const SAMPLE_IDS = new Set(Array.from({ length: 20 }, (_, index) => `PUB-${String(index + 1).padStart(3, "0")}`));
+const PACKAGE_ID = "PUBLIC-CALIBRATION-TR-EN-150-V1";
+const SCHEMA_VERSION = "alfa_public_bilingual_annotation_block_export_v2";
+const CONSENT_VERSION = "alfa_remote_submission_consent_v2";
+const MAX_BODY_BYTES = 128 * 1024;
+const BLOCK_SIZE = 50;
+const MASTER_BANK_SIZE = 150;
+const BLOCKS = new Map([
+  ["BLOCK-01", { index: 1, first: 1, last: 50 }],
+  ["BLOCK-02", { index: 2, first: 51, last: 100 }],
+  ["BLOCK-03", { index: 3, first: 101, last: 150 }]
+]);
 const DECISIONS = new Set([
   "NET_MEANING",
   "MEANINGFUL_NOISE",
@@ -32,6 +38,8 @@ type Annotation = {
 type SubmissionPayload = {
   schemaVersion: string;
   packageId: string;
+  blockId: string;
+  blockIndex: number;
   submissionId: string;
   participantCode: string;
   annotationType: string;
@@ -42,6 +50,7 @@ type SubmissionPayload = {
   clientSubmittedAt: string;
   completedCount: number;
   totalCount: number;
+  masterBankItemCount: number;
   annotations: Annotation[];
 };
 
@@ -88,6 +97,8 @@ function validatePayload(value: unknown): { ok: true; payload: SubmissionPayload
   const payload = value as SubmissionPayload;
   if (payload.schemaVersion !== SCHEMA_VERSION) return { ok: false, code: "INVALID_SCHEMA_VERSION" };
   if (payload.packageId !== PACKAGE_ID) return { ok: false, code: "INVALID_PACKAGE" };
+  const block = BLOCKS.get(payload.blockId);
+  if (!block || payload.blockIndex !== block.index) return { ok: false, code: "INVALID_BLOCK" };
   if (!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(payload.submissionId)) {
     return { ok: false, code: "INVALID_SUBMISSION_ID" };
   }
@@ -100,18 +111,30 @@ function validatePayload(value: unknown): { ok: true; payload: SubmissionPayload
   if (!validIsoTimestamp(payload.consentedAt) || !validIsoTimestamp(payload.clientSubmittedAt)) {
     return { ok: false, code: "INVALID_TIMESTAMPS" };
   }
-  if (payload.completedCount !== 20 || payload.totalCount !== 20 || !Array.isArray(payload.annotations) || payload.annotations.length !== 20) {
+  if (
+    payload.completedCount !== BLOCK_SIZE
+    || payload.totalCount !== BLOCK_SIZE
+    || payload.masterBankItemCount !== MASTER_BANK_SIZE
+    || !Array.isArray(payload.annotations)
+    || payload.annotations.length !== BLOCK_SIZE
+  ) {
     return { ok: false, code: "INCOMPLETE_SUBMISSION" };
   }
 
+  const sampleIds = new Set(
+    Array.from(
+      { length: BLOCK_SIZE },
+      (_, index) => `PUB-${String(block.first + index).padStart(3, "0")}`
+    )
+  );
   const seenSamples = new Set<string>();
   const seenOrder = new Set<number>();
   for (const annotation of payload.annotations) {
     if (!annotation || typeof annotation !== "object") return { ok: false, code: "INVALID_ANNOTATION" };
-    if (!SAMPLE_IDS.has(annotation.sampleId) || seenSamples.has(annotation.sampleId)) {
+    if (!sampleIds.has(annotation.sampleId) || seenSamples.has(annotation.sampleId)) {
       return { ok: false, code: "INVALID_SAMPLE_SET" };
     }
-    if (!Number.isInteger(annotation.orderIndex) || annotation.orderIndex < 0 || annotation.orderIndex > 19 || seenOrder.has(annotation.orderIndex)) {
+    if (!Number.isInteger(annotation.orderIndex) || annotation.orderIndex < 0 || annotation.orderIndex >= BLOCK_SIZE || seenOrder.has(annotation.orderIndex)) {
       return { ok: false, code: "INVALID_ORDER" };
     }
     if (!DECISIONS.has(annotation.decisionClass)) return { ok: false, code: "INVALID_DECISION" };
@@ -125,7 +148,7 @@ function validatePayload(value: unknown): { ok: true; payload: SubmissionPayload
     seenSamples.add(annotation.sampleId);
     seenOrder.add(annotation.orderIndex);
   }
-  if (seenSamples.size !== SAMPLE_IDS.size || [...SAMPLE_IDS].some((id) => !seenSamples.has(id))) {
+  if (seenSamples.size !== sampleIds.size || [...sampleIds].some((id) => !seenSamples.has(id))) {
     return { ok: false, code: "INVALID_SAMPLE_SET" };
   }
   return { ok: true, payload };
@@ -193,6 +216,9 @@ Deno.serve(async (request) => {
     submission_id: payload.submissionId,
     receipt_id: proposedReceipt,
     package_id: payload.packageId,
+    block_id: payload.blockId,
+    block_index: payload.blockIndex,
+    master_bank_size: payload.masterBankItemCount,
     schema_version: payload.schemaVersion,
     consent_version: payload.consentVersion,
     participant_code: payload.participantCode,
@@ -202,7 +228,7 @@ Deno.serve(async (request) => {
     annotations: payload.annotations,
     client_consented_at: payload.consentedAt,
     client_submitted_at: payload.clientSubmittedAt,
-    source_version: "public-pilot-v0.2.0"
+    source_version: "public-calibration-v0.3.0"
   };
 
   const { data: inserted, error: insertError } = await supabase

@@ -4,8 +4,9 @@
 
 - Participation is voluntary.
 - Draft progress is stored in local browser storage until it is reset.
-- Nothing is transmitted while answering. After all items are complete, the
-  participant may separately consent and press the secure submission button.
+- Nothing is transmitted while answering. After all 50 items in a block are
+  complete, the participant may separately consent and press the secure
+  submission button. Each block is transmitted separately.
 - A submitted record contains the pseudonymous participant code, decisions,
   confidence values, optional notes, item order and timing metadata.
 - The application database does not store an IP address, user agent, real name
@@ -26,8 +27,9 @@
 
 - Katılım gönüllüdür.
 - Taslak ilerleme sıfırlanana kadar tarayıcının yerel alanında saklanır.
-- Yanıtlama sırasında hiçbir veri iletilmez. Tüm öğeler tamamlandıktan sonra
-  katılımcı ayrıca onay verip güvenli gönderim düğmesine basabilir.
+- Yanıtlama sırasında hiçbir veri iletilmez. Bir bölümdeki 50 öğe
+  tamamlandıktan sonra katılımcı ayrıca onay verip güvenli gönderim düğmesine
+  basabilir. Her bölüm ayrı iletilir.
 - Gönderilen kayıt; takma katılımcı kodunu, kararları, güven değerlerini,
   isteğe bağlı notları, öğe sırasını ve zaman bilgisini içerir.
 - Uygulama veritabanında IP adresi, tarayıcı bilgisi, gerçek ad veya iletişim

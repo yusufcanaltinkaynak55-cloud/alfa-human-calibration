@@ -28,7 +28,8 @@ const allowedPaths = new Set([
   "SUBMISSION_DEPLOYMENT.md",
   "supabase/config.toml",
   "supabase/functions/submit-annotations/index.ts",
-  "supabase/migrations/202607190001_create_human_annotation_submissions.sql"
+  "supabase/migrations/202607190001_create_human_annotation_submissions.sql",
+  "supabase/migrations/202607190002_expand_to_150_blocked.sql"
 ]);
 const forbiddenNames = new Set([
   ".env",
@@ -103,7 +104,7 @@ const manifest = {
   files: manifestFiles
 };
 const pilotSource = fs.readFileSync(path.join(root, "pilot-items.js"), "utf8");
-if (/\b(?:decisionClass|expectedLabel|modelPrediction)\s*:/.test(pilotSource)) {
+if (/\b(?:decisionClass|expectedLabel|modelPrediction|designFamily|goldLabel|targetClass)\s*:/.test(pilotSource)) {
   throw new Error("Pilot items contain a forbidden label or prediction field.");
 }
 const sandbox = { window: {} };
@@ -112,16 +113,38 @@ const pilot = sandbox.window.ALFA_PUBLIC_PILOT;
 if (!pilot || pilot.expectedLabelsIncluded !== false) {
   throw new Error("Pilot package does not declare an unlabeled boundary.");
 }
-if (!Array.isArray(pilot.items) || pilot.items.length !== 20) {
-  throw new Error("Pilot package must contain exactly 20 items.");
+if (
+  pilot.schemaVersion !== "alfa_public_bilingual_annotation_package_v2"
+  || pilot.packageId !== "PUBLIC-CALIBRATION-TR-EN-150-V1"
+  || pilot.blockSize !== 50
+) {
+  throw new Error("Calibration package metadata is invalid.");
+}
+if (!Array.isArray(pilot.blocks) || pilot.blocks.length !== 3) {
+  throw new Error("Calibration package must declare exactly three blocks.");
+}
+if (!Array.isArray(pilot.items) || pilot.items.length !== 150) {
+  throw new Error("Calibration package must contain exactly 150 items.");
 }
 const itemIds = new Set();
+const blockCounts = new Map(pilot.blocks.map((block) => [block.id, 0]));
 for (const item of pilot.items) {
-  if (!item?.id || !item?.tr || !item?.en) {
-    throw new Error("Every pilot item must contain id, tr and en.");
+  if (!item?.id || !item?.blockId || !item?.tr || !item?.en) {
+    throw new Error("Every calibration item must contain id, blockId, tr and en.");
   }
   if (itemIds.has(item.id)) throw new Error(`Duplicate pilot id: ${item.id}`);
+  if (!blockCounts.has(item.blockId)) throw new Error(`Unknown block id: ${item.blockId}`);
+  const keys = Object.keys(item).sort().join(",");
+  if (keys !== "blockId,en,id,tr") {
+    throw new Error(`Unexpected public item field set for ${item.id}: ${keys}`);
+  }
   itemIds.add(item.id);
+  blockCounts.set(item.blockId, blockCounts.get(item.blockId) + 1);
+}
+for (const block of pilot.blocks) {
+  if (block.itemCount !== 50 || blockCounts.get(block.id) !== 50) {
+    throw new Error(`Block ${block.id} must contain exactly 50 items.`);
+  }
 }
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
 for (const required of [
@@ -134,7 +157,11 @@ for (const required of [
   "runtime-config.js",
   "submissionForm",
   "remoteConsentCheck",
-  "submitResultsButton"
+  "submitResultsButton",
+  "blockPills",
+  "nextBlockButton",
+  "finalPanel",
+  "totalProgressText"
 ]) {
   if (!html.includes(required)) throw new Error(`Missing site contract: ${required}`);
 }
@@ -168,12 +195,16 @@ for (const required of [
   "INVALID_STUDY_ACCESS",
   "BLINDING_CONTRACT_BROKEN",
   "INCOMPLETE_SUBMISSION",
+  "INVALID_BLOCK",
+  "BLOCK_SIZE = 50",
+  "MASTER_BANK_SIZE = 150",
+  "PUBLIC-CALIBRATION-TR-EN-150-V1",
   "ignoreDuplicates: true",
   "https://yusufcanaltinkaynak55-cloud.github.io"
 ]) {
   if (!functionSource.includes(required)) throw new Error(`Missing submission security contract: ${required}`);
 }
-const migrationSource = fs.readFileSync(
+const initialMigrationSource = fs.readFileSync(
   path.join(root, "supabase/migrations/202607190001_create_human_annotation_submissions.sql"),
   "utf8"
 );
@@ -184,8 +215,25 @@ for (const required of [
   "submission_id uuid not null unique",
   "completed_count integer not null check (completed_count = 20)"
 ]) {
-  if (!migrationSource.toLowerCase().includes(required.toLowerCase())) {
+  if (!initialMigrationSource.toLowerCase().includes(required.toLowerCase())) {
     throw new Error(`Missing database security contract: ${required}`);
+  }
+}
+const expansionMigrationSource = fs.readFileSync(
+  path.join(root, "supabase/migrations/202607190002_expand_to_150_blocked.sql"),
+  "utf8"
+);
+for (const required of [
+  "block_id text",
+  "master_bank_size integer",
+  "completed_count = 50",
+  "total_count = 50",
+  "master_bank_size = 150",
+  "jsonb_array_length(annotations) = completed_count",
+  "public-calibration-v0.3.0"
+]) {
+  if (!expansionMigrationSource.toLowerCase().includes(required.toLowerCase())) {
+    throw new Error(`Missing blocked-calibration database contract: ${required}`);
   }
 }
 fs.writeFileSync(

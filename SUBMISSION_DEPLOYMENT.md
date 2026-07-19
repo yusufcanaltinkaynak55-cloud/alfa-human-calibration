@@ -12,12 +12,14 @@ yöneticisine girilmeli ve hiçbir zaman Git'e eklenmemelidir.
 - `submit-annotations` is the only public write endpoint.
 - The function accepts requests only from the published site (and local
   development origins), requires a coordinator-provided study access code and
-  validates the complete 20-item payload again on the server.
+  validates each complete 50-item block payload again on the server.
 - The database table has Row Level Security enabled and grants no access to
   anonymous or authenticated browser roles.
 - A backend-only Supabase secret key performs the insert.
 - The application table contains no IP-address or user-agent column.
-- Repeating the same `submissionId` returns the original receipt instead of
+- The 150-item public bank is accepted only as `BLOCK-01`, `BLOCK-02` or
+  `BLOCK-03`, each with its exact 50-item identifier set.
+- Repeating the same block `submissionId` returns the original receipt instead of
   creating a duplicate row.
 
 ## Required hosted secret / Gerekli barındırılan gizli değer

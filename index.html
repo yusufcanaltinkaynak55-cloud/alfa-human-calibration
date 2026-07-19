@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="ALFA Human Calibration bilingual blind annotation pilot.">
+  <meta name="description" content="ALFA Human Calibration: 150-item bilingual blind annotation bank in three 50-item blocks.">
   <meta name="color-scheme" content="dark">
   <title>ALFA Human Calibration · İnsan Kalibrasyonu</title>
   <link rel="icon" href="data:,">
@@ -33,7 +33,7 @@
   <main id="top">
     <section class="hero">
       <div class="hero-copy">
-        <p class="eyebrow"><span></span> Blind bilingual research pilot</p>
+        <p class="eyebrow"><span></span> 150-item bilingual calibration bank</p>
         <h1>İki dilde okuyun.<br><em>Tek bir bağımsız karar verin.</em></h1>
         <p class="hero-lead">
           Türkçe ve İngilizce metinleri yan yana değerlendiren kör insan
@@ -41,12 +41,13 @@
           yanıtları gösterilmez.
         </p>
         <p class="hero-lead en">
-          Blind human annotation of Turkish and English texts side by side.
+          A 150-item blind human annotation bank delivered in three independent
+          50-item blocks. Turkish and English texts are shown side by side.
           Model predictions, expected labels and other participants' responses
           are never shown. Drafts remain local until explicit submission.
         </p>
         <div class="hero-actions">
-          <a class="primary-button" href="#annotation">Pilotu aç · Open pilot</a>
+          <a class="primary-button" href="#annotation">Çalışmayı aç · Open study</a>
           <a class="text-link" href="#method">Yöntemi incele · Read method →</a>
         </div>
       </div>
@@ -57,7 +58,7 @@
           <small>Kamusal araştırma yüzeyi</small>
         </div>
         <dl>
-          <div><dt>Görev · Task</dt><dd>Belge sınıfı · Document class</dd></div>
+          <div><dt>Görev · Task</dt><dd>3 × 50 belge sınıfı kararı</dd></div>
           <div><dt>Diller · Languages</dt><dd>Türkçe + English</dd></div>
           <div><dt>Körlük · Blinding</dt><dd>Model sonucu gizli · Hidden</dd></div>
           <div><dt>Veri · Data</dt><dd>Yerel taslak + onaylı gönderim</dd></div>
@@ -100,7 +101,7 @@
 
     <section class="annotation-shell" id="annotation" aria-labelledby="annotation-title">
       <div class="annotation-intro">
-        <p class="eyebrow"><span></span> Development pilot · Geliştirme pilotu</p>
+        <p class="eyebrow"><span></span> Development calibration bank · Geliştirme kalibrasyon bankası</p>
         <h2 id="annotation-title">Anotasyon çalışma alanı</h2>
         <p>Annotation workspace · Drafts remain in this browser until explicit submission.</p>
       </div>
@@ -138,14 +139,22 @@
       </div>
 
       <div class="workspace" id="workspace" hidden>
+        <div class="block-overview">
+          <div>
+            <span class="panel-kicker">Three-stage study · Üç aşamalı çalışma</span>
+            <strong id="blockLabel">Bölüm 1/3 · Block 1/3</strong>
+            <small id="totalProgressText">0 / 150 toplam · total</small>
+          </div>
+          <div class="block-pills" id="blockPills" aria-label="Block progress / Bölüm ilerlemesi"></div>
+        </div>
         <div class="workspace-toolbar">
           <div>
-            <span>İlerleme · Progress</span>
+            <span>Bu bölüm · This block</span>
             <strong id="progressText">0 / 0</strong>
           </div>
           <div class="progress-track" aria-hidden="true"><span id="progressBar"></span></div>
           <div class="toolbar-actions">
-            <button class="secondary-button" id="exportButton" type="button">JSON dışa aktar · Export</button>
+            <button class="secondary-button" id="exportButton" type="button">Bölüm JSON · Block JSON</button>
             <button class="danger-link" id="resetButton" type="button">Sıfırla · Reset</button>
           </div>
         </div>
@@ -204,12 +213,14 @@
             <span class="panel-kicker">Secure handoff · Güvenli teslim</span>
             <h3 id="submissionTitle">Sonuçları araştırma ekibine gönder</h3>
             <p>
-              Gönderim yalnız 20 örnek tamamlandığında açılır. Katılımcı kodu,
+              Her bölüm ayrı bir 50 maddelik teslimdir. Gönderim bu bölümdeki
+              50 örnek tamamlandığında açılır. Katılımcı kodu,
               kararlar, güven değerleri, isteğe bağlı notlar ve zaman bilgisi
               araştırma veritabanına iletilir.
             </p>
             <p class="en">
-              Submission unlocks after all 20 items are complete. Your
+              Each block is a separate 50-item submission. Submission unlocks
+              after all items in the current block are complete. Your
               pseudonymous code, decisions, confidence values, optional notes
               and timing metadata are sent to the research database.
             </p>
@@ -230,10 +241,20 @@
               </span>
             </label>
             <button class="primary-button" id="submitResultsButton" type="submit" disabled>
-              Sonuçları güvenli gönder · Securely submit
+              Bu bölümü güvenli gönder · Securely submit this block
             </button>
-            <small class="submission-hint" id="submissionHint">Önce 20 örneği tamamlayın. · Complete all 20 items first.</small>
+            <small class="submission-hint" id="submissionHint">Önce bu bölümdeki 50 örneği tamamlayın. · Complete all 50 items in this block.</small>
+            <button class="primary-button next-block-button" id="nextBlockButton" type="button" hidden>
+              Sonraki 50'lik bölüme geç · Continue to the next block
+            </button>
           </form>
+        </section>
+
+        <section class="final-panel" id="finalPanel" hidden>
+          <span class="panel-kicker">Study complete · Çalışma tamamlandı</span>
+          <h3>150 / 150</h3>
+          <p>Üç bölüm de güvenli biçimde teslim edildi. Teşekkür ederiz.</p>
+          <p class="en">All three blocks were securely submitted. Thank you.</p>
         </section>
       </div>
     </section>
@@ -242,7 +263,7 @@
   <footer>
     <div class="brand footer-brand">
       <span class="brand-mark" aria-hidden="true">A</span>
-      <span><strong>ALFA Human Calibration</strong><small>Public pilot v0.2.0</small></span>
+      <span><strong>ALFA Human Calibration</strong><small>Public calibration bank v0.3.0</small></span>
     </div>
     <p>Development tool, not scientific proof. · Geliştirme aracı, bilimsel kanıt değildir.</p>
     <div><a href="./METHOD.md">Method</a><a href="./PRIVACY.md">Privacy</a><a href="./PUBLICATION_BOUNDARY.md">Boundary</a></div>
