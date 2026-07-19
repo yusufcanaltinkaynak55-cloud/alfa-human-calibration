@@ -1,0 +1,21 @@
+name: Public boundary
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out public package
+        uses: actions/checkout@v4
+
+      - name: Verify public-only boundary
+        run: node scripts/verify-public-package.mjs
+
+      - name: Confirm manifest is current
+        run: git diff --exit-code -- PUBLICATION_MANIFEST.json

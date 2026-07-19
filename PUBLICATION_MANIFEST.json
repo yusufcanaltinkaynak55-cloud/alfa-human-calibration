@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "alfa_public_release_manifest_v1",
+  "packageId": "alfa-human-calibration",
+  "publicBoundaryVerified": true,
+  "containsExpectedLabels": false,
+  "containsModelPredictions": false,
+  "containsCoreCode": false,
+  "containsCredentials": false,
+  "files": [
+    {
+      "path": ".github/workflows/public-boundary.yml",
+      "bytes": 411,
+      "sha256": "c51e61311b75cec62dfaee01ca7e07940e547f6c21e92da3c80cf393621fad06"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 72,
+      "sha256": "7910c2cd32e2b256048443eaec79b6df9120e884c12a0618ac3f745b6f8bd7a0"
+    },
+    {
+      "path": ".nojekyll",
+      "bytes": 1,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    {
+      "path": "CITATION.cff",
+      "bytes": 289,
+      "sha256": "e9ba7176fd3b9d01d9c4272e83ce3737f31847827a5748ce2a23c00029237cf2"
+    },
+    {
+      "path": "GITHUB_PUBLISH.md",
+      "bytes": 1281,
+      "sha256": "768f956243c7ceba5816d01ea1650b0ea498c4db7e7ecc6bd8130bdd505490f7"
+    },
+    {
+      "path": "LICENSE_NOTICE.md",
+      "bytes": 707,
+      "sha256": "62955bb8763d165889c8cf84ed77ad21a965039bcc9bbe30c70f06f74dcdafdd"
+    },
+    {
+      "path": "METHOD.md",
+      "bytes": 1551,
+      "sha256": "2e85229bf6f9d116849f59039ebfac000e65db4090b25e2801779306ef91a0d8"
+    },
+    {
+      "path": "PRIVACY.md",
+      "bytes": 1189,
+      "sha256": "d6771fb9c2b60b180fa4a5996c3ca579c42956456ea94fb73d6e48d38fcdd87c"
+    },
+    {
+      "path": "PUBLICATION_BOUNDARY.md",
+      "bytes": 1172,
+      "sha256": "82e5179dbcecd68e716f195785f441689cbb0b8151e15d6fd0b3599406fd0b06"
+    },
+    {
+      "path": "README.md",
+      "bytes": 2201,
+      "sha256": "e66e9e2edbbc543a382390b21e58bac68881187ec863d20fd48e629d77b86ca5"
+    },
+    {
+      "path": "app.js",
+      "bytes": 9956,
+      "sha256": "a1503e78d524d0022eab33bba3820e75c9b1689ff0cd7689e787f6c260f06777"
+    },
+    {
+      "path": "index.html",
+      "bytes": 9105,
+      "sha256": "a8f4752aa47ef7e70cf47b7c3193fec918a0b79469cb1755a38f9bf5bbc16270"
+    },
+    {
+      "path": "pilot-items.js",
+      "bytes": 4151,
+      "sha256": "6e34bb228cf0881aee63330858e5ade994c71c7f0d112ceec67bdda1aaa1e26e"
+    },
+    {
+      "path": "scripts/verify-public-package.mjs",
+      "bytes": 4403,
+      "sha256": "032cddee6ed7e30df7cda6e58caeec3c29081874f74313ec6d2ddb7f92379e18"
+    },
+    {
+      "path": "styles.css",
+      "bytes": 15125,
+      "sha256": "570bbf6d8b8079f62e8a509611a3a09bb10ed21b78941a898f7d00f09a3fd5f3"
+    }
+  ]
+}
