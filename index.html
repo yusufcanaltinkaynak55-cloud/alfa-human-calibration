@@ -9,6 +9,7 @@
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="./styles.css">
   <script src="./pilot-items.js" defer></script>
+  <script src="./runtime-config.js" defer></script>
   <script src="./app.js" defer></script>
 </head>
 <body>
@@ -42,7 +43,7 @@
         <p class="hero-lead en">
           Blind human annotation of Turkish and English texts side by side.
           Model predictions, expected labels and other participants' responses
-          are never shown.
+          are never shown. Drafts remain local until explicit submission.
         </p>
         <div class="hero-actions">
           <a class="primary-button" href="#annotation">Pilotu aç · Open pilot</a>
@@ -59,7 +60,7 @@
           <div><dt>Görev · Task</dt><dd>Belge sınıfı · Document class</dd></div>
           <div><dt>Diller · Languages</dt><dd>Türkçe + English</dd></div>
           <div><dt>Körlük · Blinding</dt><dd>Model sonucu gizli · Hidden</dd></div>
-          <div><dt>Veri · Data</dt><dd>Yalnız cihazda · Device only</dd></div>
+          <div><dt>Veri · Data</dt><dd>Yerel taslak + onaylı gönderim</dd></div>
         </dl>
         <p>ALFA core, formulas, thresholds and private datasets are not included.</p>
       </aside>
@@ -83,8 +84,8 @@
         </article>
         <article>
           <span>03</span>
-          <h3>Yerel ve gönüllü<br><small>Local and voluntary</small></h3>
-          <p>Yanıtlar sunucuya gitmez; katılımcı istediği zaman silebilir veya dışa aktarabilir.</p>
+          <h3>Açık ve gönüllü<br><small>Explicit and voluntary</small></h3>
+          <p>Taslaklar yereldir. Yalnız ayrı onay ve “Gönder” eylemiyle araştırma veritabanına iletilir.</p>
         </article>
       </div>
     </section>
@@ -92,7 +93,7 @@
     <section class="privacy-strip" id="privacy">
       <div>
         <strong>Gerçek ad veya iletişim bilgisi girmeyin.</strong>
-        <span>Do not enter a real name or contact information.</span>
+        <span>Gönderim yalnız açık onayla yapılır. · Submission requires explicit consent.</span>
       </div>
       <a href="./PRIVACY.md">Tam bildirim · Full notice →</a>
     </section>
@@ -101,7 +102,7 @@
       <div class="annotation-intro">
         <p class="eyebrow"><span></span> Development pilot · Geliştirme pilotu</p>
         <h2 id="annotation-title">Anotasyon çalışma alanı</h2>
-        <p>Annotation workspace · Responses remain in this browser until export.</p>
+        <p>Annotation workspace · Drafts remain in this browser until explicit submission.</p>
       </div>
 
       <div class="consent-panel" id="consentPanel">
@@ -109,12 +110,14 @@
           <span class="panel-kicker">Before you begin · Başlamadan önce</span>
           <h3>Gönüllü katılım ve yerel kayıt</h3>
           <p>
-            Bu pilot kurumsal etik kurul onayı iddia etmez. Yanıtlar yalnız bu
-            tarayıcıda saklanır. Katılımı istediğiniz zaman bırakabilirsiniz.
+            Bu pilot kurumsal etik kurul onayı iddia etmez. Taslaklar gönderim
+            düğmesine basılana kadar bu tarayıcıda saklanır. Katılımı istediğiniz
+            zaman bırakabilirsiniz.
           </p>
           <p class="en">
-            This pilot does not claim institutional ethics approval. Responses
-            remain in this browser. You may stop at any time.
+            This pilot does not claim institutional ethics approval. Drafts
+            remain in this browser until you explicitly submit them. You may
+            stop at any time.
           </p>
         </div>
         <form id="consentForm">
@@ -195,6 +198,43 @@
             </div>
           </form>
         </div>
+
+        <section class="submission-panel" aria-labelledby="submissionTitle">
+          <div class="submission-copy">
+            <span class="panel-kicker">Secure handoff · Güvenli teslim</span>
+            <h3 id="submissionTitle">Sonuçları araştırma ekibine gönder</h3>
+            <p>
+              Gönderim yalnız 20 örnek tamamlandığında açılır. Katılımcı kodu,
+              kararlar, güven değerleri, isteğe bağlı notlar ve zaman bilgisi
+              araştırma veritabanına iletilir.
+            </p>
+            <p class="en">
+              Submission unlocks after all 20 items are complete. Your
+              pseudonymous code, decisions, confidence values, optional notes
+              and timing metadata are sent to the research database.
+            </p>
+            <p class="submission-status" id="submissionStatus" role="status" aria-live="polite"></p>
+          </div>
+          <form id="submissionForm" class="submission-form">
+            <label>
+              <span>Çalışma erişim kodu · Study access code</span>
+              <input id="studyAccessCode" type="password" maxlength="96"
+                autocomplete="off" placeholder="Koordinatörden alın · Ask the coordinator" required>
+              <small>Kod yalnız gönderim sırasında kullanılır; tarayıcıya veya veri tabanına kaydedilmez.</small>
+            </label>
+            <label class="check-row">
+              <input id="remoteConsentCheck" type="checkbox" required>
+              <span>
+                Yukarıda açıklanan verilerin araştırma veritabanına gönderilmesini onaylıyorum.
+                <br><small>I consent to sending the data described above to the research database.</small>
+              </span>
+            </label>
+            <button class="primary-button" id="submitResultsButton" type="submit" disabled>
+              Sonuçları güvenli gönder · Securely submit
+            </button>
+            <small class="submission-hint" id="submissionHint">Önce 20 örneği tamamlayın. · Complete all 20 items first.</small>
+          </form>
+        </section>
       </div>
     </section>
   </main>
@@ -202,7 +242,7 @@
   <footer>
     <div class="brand footer-brand">
       <span class="brand-mark" aria-hidden="true">A</span>
-      <span><strong>ALFA Human Calibration</strong><small>Public pilot v0.1.0</small></span>
+      <span><strong>ALFA Human Calibration</strong><small>Public pilot v0.2.0</small></span>
     </div>
     <p>Development tool, not scientific proof. · Geliştirme aracı, bilimsel kanıt değildir.</p>
     <div><a href="./METHOD.md">Method</a><a href="./PRIVACY.md">Privacy</a><a href="./PUBLICATION_BOUNDARY.md">Boundary</a></div>

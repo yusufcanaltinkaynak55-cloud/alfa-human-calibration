@@ -30,6 +30,20 @@ must not contain personal information.
 Anotörler ayrıca 1–5 arasında güven bildirir. Kısa gerekçe isteğe bağlıdır ve
 kişisel bilgi içermemelidir.
 
+## Submission / Gönderim
+
+Drafts remain local during annotation. Remote submission is enabled only after
+all 20 items are complete and requires a separate consent action. The server
+revalidates the package, allowed sample identifiers, decision vocabulary,
+confidence range, note length, timestamps and blinding declarations. A stable
+submission identifier makes network retries idempotent.
+
+Anotasyon sırasında taslaklar yerel kalır. Uzak gönderim yalnız 20 öğenin tümü
+tamamlandığında açılır ve ayrı onay gerektirir. Sunucu; paketi, izinli örnek
+kimliklerini, karar sözlüğünü, güven aralığını, not uzunluğunu, zaman
+bilgilerini ve körlük bildirimlerini yeniden doğrular. Sabit gönderim kimliği,
+ağ yeniden denemelerinin yinelenen kayıt üretmesini önler.
+
 ## Analysis boundary / Analiz sınırı
 
 The pilot export is not a calibrated result. Agreement, exclusions, duplicate

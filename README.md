@@ -9,24 +9,28 @@ anotasyonu arayüzüdür.
 ## Scope / Kapsam
 
 This repository contains only the public annotation interface, an unlabeled
-pilot package, the task protocol and local JSON export. It does not contain the
-ALFA core, private datasets, model predictions, thresholds, formulas, API
-credentials or internal reports.
+pilot package, the task protocol, local JSON export and the isolated submission
+endpoint source. It does not contain the ALFA core, private datasets, model
+predictions, thresholds, formulas, API credentials, stored responses or
+internal reports.
 
 Bu depo yalnız kamusal anotasyon arayüzünü, etiketsiz pilot paketi, görev
-protokolünü ve yerel JSON dışa aktarımını içerir. ALFA çekirdeğini, özel veri
-kümelerini, model tahminlerini, eşikleri, formülleri, API bilgilerini veya
-dahili raporları içermez.
+protokolünü, yerel JSON dışa aktarımını ve yalıtılmış gönderim uç noktası
+kaynağını içerir. ALFA çekirdeğini, özel veri kümelerini, model tahminlerini,
+eşikleri, formülleri, API bilgilerini, saklanan yanıtları veya dahili raporları
+içermez.
 
 ## Privacy / Gizlilik
 
-The public pilot sends no response to a server. Progress is stored only in the
-participant's browser. The participant exports a JSON file and shares it
-through a channel separately provided by the research coordinator.
+Draft progress remains in the participant's browser. Nothing is transmitted
+while answering. After completing all items, the participant may explicitly
+consent and submit the pseudonymous annotation record to an isolated research
+database, or keep using local JSON export.
 
-Kamusal pilot hiçbir yanıtı sunucuya göndermez. İlerleme yalnız katılımcının
-tarayıcısında saklanır. Katılımcı bir JSON dosyası dışa aktarır ve araştırma
-koordinatörünün ayrıca bildirdiği kanal üzerinden paylaşır.
+Taslak ilerleme katılımcının tarayıcısında kalır. Yanıtlama sırasında hiçbir
+veri iletilmez. Tüm öğeler tamamlandıktan sonra katılımcı açıkça onay verip
+takma adlı anotasyon kaydını yalıtılmış araştırma veritabanına gönderebilir veya
+yerel JSON dışa aktarımını kullanabilir.
 
 Do not enter names, email addresses, phone numbers or other personal data.
 
@@ -34,11 +38,13 @@ Ad, e-posta, telefon veya başka kişisel bilgiler girmeyin.
 
 ## GitHub Pages
 
-The site is static and can be published directly from the repository root with
-GitHub Pages. No build step or external JavaScript service is required.
+The interface remains static on GitHub Pages. An independently deployed
+Supabase Edge Function accepts validated submissions; backend credentials are
+stored only in hosted secrets.
 
-Site statiktir ve GitHub Pages ile doğrudan depo kökünden yayımlanabilir.
-Derleme adımı veya dış JavaScript hizmeti gerektirmez.
+Arayüz GitHub Pages üzerinde statik kalır. Bağımsız yayımlanan Supabase Edge
+Function doğrulanmış gönderimleri kabul eder; arka uç kimlik bilgileri yalnız
+barındırılan gizli değerlerde saklanır.
 
 ## Scientific boundary / Bilimsel sınır
 
@@ -49,4 +55,5 @@ Bu araç geliştirme pilotu içindir. Etik kurul onayı, insan kalibrasyonu, dı
 validasyon veya bilimsel kanıt anlamına gelmez.
 
 See [METHOD.md](METHOD.md), [PRIVACY.md](PRIVACY.md) and
-[PUBLICATION_BOUNDARY.md](PUBLICATION_BOUNDARY.md).
+[PUBLICATION_BOUNDARY.md](PUBLICATION_BOUNDARY.md). Deployment maintainers
+should also read [SUBMISSION_DEPLOYMENT.md](SUBMISSION_DEPLOYMENT.md).

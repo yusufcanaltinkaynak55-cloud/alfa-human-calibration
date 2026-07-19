@@ -6,6 +6,7 @@
   "containsModelPredictions": false,
   "containsCoreCode": false,
   "containsCredentials": false,
+  "containsStoredResponses": false,
   "files": [
     {
       "path": ".github/workflows/public-boundary.yml",
@@ -14,8 +15,8 @@
     },
     {
       "path": ".gitignore",
-      "bytes": 72,
-      "sha256": "7910c2cd32e2b256048443eaec79b6df9120e884c12a0618ac3f745b6f8bd7a0"
+      "bytes": 99,
+      "sha256": "bc964002dc5d75ddf6494b440c177bdb0942af43ba8578f8ece1590d3f4b28d4"
     },
     {
       "path": ".nojekyll",
@@ -29,8 +30,8 @@
     },
     {
       "path": "GITHUB_PUBLISH.md",
-      "bytes": 1281,
-      "sha256": "768f956243c7ceba5816d01ea1650b0ea498c4db7e7ecc6bd8130bdd505490f7"
+      "bytes": 1673,
+      "sha256": "90e185646e175141c6b77f5ac3042d83ad5c23777e82b1338c61346bcaade28c"
     },
     {
       "path": "LICENSE_NOTICE.md",
@@ -39,33 +40,38 @@
     },
     {
       "path": "METHOD.md",
-      "bytes": 1551,
-      "sha256": "2e85229bf6f9d116849f59039ebfac000e65db4090b25e2801779306ef91a0d8"
+      "bytes": 2345,
+      "sha256": "f78f765deda9007a35dcc29eb25d7bb9377c39ff51f3451651b696ecda47b5e6"
     },
     {
       "path": "PRIVACY.md",
-      "bytes": 1189,
-      "sha256": "d6771fb9c2b60b180fa4a5996c3ca579c42956456ea94fb73d6e48d38fcdd87c"
+      "bytes": 2595,
+      "sha256": "3580238ad39df510b349bc23892ad010aa954b68845b1c063e134287038827de"
     },
     {
       "path": "PUBLICATION_BOUNDARY.md",
-      "bytes": 1172,
-      "sha256": "82e5179dbcecd68e716f195785f441689cbb0b8151e15d6fd0b3599406fd0b06"
+      "bytes": 1323,
+      "sha256": "2bc3038a01993c6c396366abc767bb7fedb32542d2f45ded15b4582d0b11dcfe"
     },
     {
       "path": "README.md",
-      "bytes": 2201,
-      "sha256": "e66e9e2edbbc543a382390b21e58bac68881187ec863d20fd48e629d77b86ca5"
+      "bytes": 2656,
+      "sha256": "a9f6f982153e3dc7858bd5bc9cf538a8be8d9ef299e9cbee6cd4e8af39ab2268"
+    },
+    {
+      "path": "SUBMISSION_DEPLOYMENT.md",
+      "bytes": 2532,
+      "sha256": "6777002438ee29680157c0167a2808db03d984058ea250f8d4962950b7a8e9f6"
     },
     {
       "path": "app.js",
-      "bytes": 9956,
-      "sha256": "a1503e78d524d0022eab33bba3820e75c9b1689ff0cd7689e787f6c260f06777"
+      "bytes": 16028,
+      "sha256": "6c7cb0f6ed6f6de5fb3c2feba72b22d9fed7f4525ca570b9c487b425a0ac7d7e"
     },
     {
       "path": "index.html",
-      "bytes": 9139,
-      "sha256": "30ee296667d6e83587f8fe089d7e304c7a2d77ea3e5b38a9d648309ce23f24f2"
+      "bytes": 11506,
+      "sha256": "3f10b6289bc1def709929601496a80e773b3ef6ecc26b5e0eb945d12e9b22503"
     },
     {
       "path": "pilot-items.js",
@@ -73,14 +79,34 @@
       "sha256": "6e34bb228cf0881aee63330858e5ade994c71c7f0d112ceec67bdda1aaa1e26e"
     },
     {
+      "path": "runtime-config.js",
+      "bytes": 269,
+      "sha256": "f8ef7e2296b625796090cb1e19780adc2280cc6b93bcebcc907ba79272bedeed"
+    },
+    {
       "path": "scripts/verify-public-package.mjs",
-      "bytes": 4403,
-      "sha256": "032cddee6ed7e30df7cda6e58caeec3c29081874f74313ec6d2ddb7f92379e18"
+      "bytes": 6788,
+      "sha256": "5d8e1d090c49fc5e7eeff42e062b9d27d7f087ca5aa9b6e284771aa433d78782"
     },
     {
       "path": "styles.css",
-      "bytes": 15125,
-      "sha256": "570bbf6d8b8079f62e8a509611a3a09bb10ed21b78941a898f7d00f09a3fd5f3"
+      "bytes": 16642,
+      "sha256": "e77aa36118252176456dcd2e8ae0c17601300ec60658fce12c05b49b6c1d8ab2"
+    },
+    {
+      "path": "supabase/config.toml",
+      "bytes": 495,
+      "sha256": "4bc9c9b5db9ab0396cd60c211644486fe2db8229459e21eb05e5d24fce465d34"
+    },
+    {
+      "path": "supabase/functions/submit-annotations/index.ts",
+      "bytes": 9934,
+      "sha256": "e5f29a06e519aa21c454711bdbd25fa1fc5016527433de4d9c219cef135b83d0"
+    },
+    {
+      "path": "supabase/migrations/202607190001_create_human_annotation_submissions.sql",
+      "bytes": 1146,
+      "sha256": "66c30d0ec7d4c0f8358535b020e7a731a20da1546d30d6237a70d6090c3b56e8"
     }
   ]
 }

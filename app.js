@@ -2,7 +2,9 @@
   "use strict";
 
   const PACKAGE = window.ALFA_PUBLIC_PILOT;
+  const RUNTIME = window.ALFA_PUBLIC_RUNTIME || {};
   const STORAGE_KEY = "alfa_public_annotation_v1";
+  const REMOTE_CONSENT_VERSION = "alfa_remote_submission_consent_v1";
   const DECISIONS = [
     ["NET_MEANING", "Net Anlam", "Clear Meaning"],
     ["MEANINGFUL_NOISE", "Gürültülü ama Anlamlı", "Noisy but Meaningful"],
@@ -26,6 +28,15 @@
 
   let state = readState();
   let currentIndex = 0;
+
+  function newSubmissionId() {
+    if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
+    const bytes = crypto.getRandomValues(new Uint8Array(16));
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+    const hex = [...bytes].map((value) => value.toString(16).padStart(2, "0")).join("");
+    return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  }
 
   function safeCode(value) {
     return String(value || "")
@@ -59,9 +70,11 @@
       schemaVersion: "alfa_public_annotation_state_v1",
       packageId: PACKAGE.packageId,
       participantCode: "",
+      submissionId: newSubmissionId(),
       consentedAt: null,
       order: [],
       annotations: {},
+      remoteSubmission: null,
       startedAt: null,
       updatedAt: null
     };
@@ -71,7 +84,13 @@
     try {
       const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
       if (!parsed || parsed.packageId !== PACKAGE.packageId) return emptyState();
-      return { ...emptyState(), ...parsed, annotations: parsed.annotations || {} };
+      return {
+        ...emptyState(),
+        ...parsed,
+        submissionId: parsed.submissionId || newSubmissionId(),
+        annotations: parsed.annotations || {},
+        remoteSubmission: parsed.remoteSubmission || null
+      };
     } catch (_error) {
       return emptyState();
     }
@@ -92,6 +111,81 @@
 
   function completedCount() {
     return state.order.filter((id) => Boolean(state.annotations[id]?.decisionClass)).length;
+  }
+
+  function remoteSubmissionConfigured() {
+    if (RUNTIME.submissionEnabled !== true) return false;
+    try {
+      const endpoint = new URL(RUNTIME.submissionEndpoint);
+      return (
+        endpoint.protocol === "https:"
+        && endpoint.hostname.endsWith(".supabase.co")
+        && endpoint.pathname === "/functions/v1/submit-annotations"
+      );
+    } catch (_error) {
+      return false;
+    }
+  }
+
+  function annotationRows() {
+    return state.order
+      .filter((id) => Boolean(state.annotations[id]?.decisionClass))
+      .map((id, index) => ({
+        sampleId: id,
+        orderIndex: index,
+        decisionClass: state.annotations[id].decisionClass,
+        confidence: state.annotations[id].confidence,
+        note: state.annotations[id].note || "",
+        firstSeenAt: state.annotations[id].firstSeenAt,
+        updatedAt: state.annotations[id].updatedAt
+      }));
+  }
+
+  function buildPayload() {
+    const rows = annotationRows();
+    return {
+      schemaVersion: "alfa_public_bilingual_annotation_export_v1",
+      packageId: PACKAGE.packageId,
+      submissionId: state.submissionId,
+      participantCode: state.participantCode,
+      annotationType: "independent_blind_human",
+      consentVersion: REMOTE_CONSENT_VERSION,
+      modelOutputWasVisible: false,
+      expectedLabelsWereVisible: false,
+      consentedAt: state.consentedAt,
+      exportedAt: new Date().toISOString(),
+      completedCount: rows.length,
+      totalCount: state.order.length,
+      annotations: rows
+    };
+  }
+
+  function updateSubmissionUI() {
+    const button = byId("submitResultsButton");
+    const hint = byId("submissionHint");
+    const status = byId("submissionStatus");
+    if (!button || !hint || !status) return;
+    const completed = completedCount();
+    const configured = remoteSubmissionConfigured();
+    const receipt = state.remoteSubmission?.receiptId;
+    button.disabled = completed !== state.order.length || !configured || Boolean(receipt);
+    if (receipt) {
+      hint.textContent = `Teslim numarası · Receipt: ${receipt}`;
+      status.className = "submission-status is-success";
+      status.textContent = "Sonuçlar güvenli biçimde teslim edildi. Sonraki yerel değişiklikler bu teslimi değiştirmez. · Results were securely submitted.";
+    } else if (!configured) {
+      hint.textContent = "Güvenli gönderim henüz yapılandırılmadı. JSON dışa aktarımı kullanılabilir. · Secure submission is not configured yet.";
+      status.className = "submission-status";
+      status.textContent = "";
+    } else if (completed !== state.order.length) {
+      hint.textContent = `Önce ${state.order.length - completed} örneği daha tamamlayın. · Complete ${state.order.length - completed} more item(s).`;
+      status.className = "submission-status";
+      status.textContent = "";
+    } else {
+      hint.textContent = "Hazır: erişim kodunu ve onayı tamamlayın. · Ready: enter the access code and confirm consent.";
+      status.className = "submission-status";
+      status.textContent = "";
+    }
   }
 
   function buildOptions() {
@@ -178,6 +272,7 @@
     byId("previousButton").disabled = currentIndex === 0;
     formMessage.textContent = "";
     renderNavigation();
+    updateSubmissionUI();
   }
 
   function openWorkspace() {
@@ -236,30 +331,7 @@
   });
 
   byId("exportButton").addEventListener("click", () => {
-    const rows = state.order
-      .filter((id) => Boolean(state.annotations[id]?.decisionClass))
-      .map((id, index) => ({
-        sampleId: id,
-        orderIndex: index,
-        decisionClass: state.annotations[id].decisionClass,
-        confidence: state.annotations[id].confidence,
-        note: state.annotations[id].note || "",
-        firstSeenAt: state.annotations[id].firstSeenAt,
-        updatedAt: state.annotations[id].updatedAt
-      }));
-    const payload = {
-      schemaVersion: "alfa_public_bilingual_annotation_export_v1",
-      packageId: PACKAGE.packageId,
-      participantCode: state.participantCode,
-      annotationType: "independent_blind_human",
-      modelOutputWasVisible: false,
-      expectedLabelsWereVisible: false,
-      consentedAt: state.consentedAt,
-      exportedAt: new Date().toISOString(),
-      completedCount: rows.length,
-      totalCount: state.order.length,
-      annotations: rows
-    };
+    const payload = buildPayload();
     const blob = new Blob([`${JSON.stringify(payload, null, 2)}\n`], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
@@ -269,6 +341,76 @@
     anchor.click();
     anchor.remove();
     URL.revokeObjectURL(url);
+  });
+
+  byId("submissionForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = byId("submitResultsButton");
+    const status = byId("submissionStatus");
+    const accessInput = byId("studyAccessCode");
+    const consent = byId("remoteConsentCheck");
+    if (!remoteSubmissionConfigured()) {
+      status.className = "submission-status is-error";
+      status.textContent = "Güvenli gönderim henüz yapılandırılmadı. · Secure submission is not configured.";
+      return;
+    }
+    if (completedCount() !== state.order.length) {
+      status.className = "submission-status is-error";
+      status.textContent = "Göndermeden önce tüm örnekleri tamamlayın. · Complete all items before submission.";
+      return;
+    }
+    if (!accessInput.value || !consent.checked) {
+      status.className = "submission-status is-error";
+      status.textContent = "Erişim kodunu girin ve uzak gönderimi onaylayın. · Enter the access code and confirm remote submission.";
+      return;
+    }
+    button.disabled = true;
+    button.textContent = "Gönderiliyor · Submitting…";
+    status.className = "submission-status";
+    status.textContent = "Şifreli bağlantı üzerinden teslim ediliyor… · Sending over an encrypted connection…";
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 20000);
+    try {
+      const response = await fetch(RUNTIME.submissionEndpoint, {
+        method: "POST",
+        mode: "cors",
+        credentials: "omit",
+        referrerPolicy: "strict-origin",
+        headers: {
+          "Content-Type": "application/json",
+          "X-ALFA-Study-Access": accessInput.value
+        },
+        body: JSON.stringify({
+          ...buildPayload(),
+          clientSubmittedAt: new Date().toISOString()
+        }),
+        signal: controller.signal
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok || result.ok !== true || !result.receiptId) {
+        throw new Error(result.code || "SUBMISSION_REJECTED");
+      }
+      state.remoteSubmission = {
+        status: "submitted",
+        receiptId: result.receiptId,
+        receivedAt: result.receivedAt || null,
+        submittedAt: new Date().toISOString()
+      };
+      persist();
+      accessInput.value = "";
+      consent.checked = false;
+      updateSubmissionUI();
+    } catch (error) {
+      const code = error?.name === "AbortError" ? "TIMEOUT" : String(error?.message || "SUBMISSION_FAILED");
+      status.className = "submission-status is-error";
+      status.textContent = code === "INVALID_STUDY_ACCESS"
+        ? "Çalışma erişim kodu geçersiz. · Invalid study access code."
+        : "Teslim tamamlanamadı; yerel yanıtlarınız korunuyor. Yeniden deneyebilir veya JSON indirebilirsiniz. · Submission failed; your local responses are safe.";
+      button.disabled = false;
+    } finally {
+      clearTimeout(timeout);
+      button.textContent = "Sonuçları güvenli gönder · Securely submit";
+    }
   });
 
   byId("resetButton").addEventListener("click", () => {
@@ -282,6 +424,7 @@
     workspace.hidden = true;
     consentPanel.hidden = false;
     byId("consentForm").reset();
+    byId("submissionForm").reset();
   });
 
   if (state.consentedAt && state.order.length === PACKAGE.items.length) {

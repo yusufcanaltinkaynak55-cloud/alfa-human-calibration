@@ -5,7 +5,9 @@ Public / Kamusal:
 - bilingual blind annotation interface / iki dilli kör anotasyon arayüzü
 - unlabeled pilot items / etiketsiz pilot öğeler
 - task definitions and privacy notice / görev tanımları ve gizlilik bildirimi
-- local anonymous JSON export / yerel anonim JSON dışa aktarımı
+- local pseudonymous JSON export / yerel takma adlı JSON dışa aktarımı
+- isolated submission contract, migration and endpoint source / yalıtılmış
+  gönderim sözleşmesi, geçişi ve uç nokta kaynağı
 
 Private / Gizli:
 
@@ -13,7 +15,8 @@ Private / Gizli:
 - formulas, thresholds and calibration profiles / formüller, eşikler ve kalibrasyon profilleri
 - expected labels and model predictions / beklenen etiketler ve model tahminleri
 - private development or test datasets / özel geliştirme ve test veri kümeleri
-- raw response database and administrative tools / ham yanıt veritabanı ve yönetim araçları
+- stored response rows and administrative tools / saklanan yanıt satırları ve
+  yönetim araçları
 - credentials, environment files and internal history / kimlik bilgileri, ortam dosyaları ve dahili geçmiş
 
 This repository must be created independently. It must never be produced by
