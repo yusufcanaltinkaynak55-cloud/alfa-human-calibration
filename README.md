@@ -28,10 +28,18 @@ while answering. Each completed 50-item block requires a separate explicit
 submission action and receives its own receipt. The participant may pause
 between blocks or use block-level local JSON export.
 
+For abuse control, the server accepts at most two distinct submissions from the
+same network for each block. It stores no raw IP address; only a secret-keyed
+one-way network fingerprint is retained for this limit.
+
 Taslak ilerleme katılımcının tarayıcısında kalır. Yanıtlama sırasında hiçbir
 veri iletilmez. Tamamlanan her 50 maddelik bölüm ayrı açık gönderim eylemi ve
 ayrı teslim numarası gerektirir. Katılımcı bölümler arasında ara verebilir veya
 bölüm düzeyi yerel JSON dışa aktarımını kullanabilir.
+
+Kötüye kullanımı sınırlamak için sunucu aynı ağdan her bölüm için en fazla iki
+farklı gönderim kabul eder. Ham IP adresi saklanmaz; yalnız bu sınır için gizli
+anahtarla üretilmiş tek yönlü ağ parmak izi tutulur.
 
 Do not enter names, email addresses, phone numbers or other personal data.
 

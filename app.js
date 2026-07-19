@@ -535,9 +535,13 @@
     } catch (error) {
       const code = error?.name === "AbortError" ? "TIMEOUT" : String(error?.message || "SUBMISSION_FAILED");
       status.className = "submission-status is-error";
-      status.textContent = code === "INVALID_STUDY_ACCESS"
-        ? "Çalışma erişim kodu geçersiz. · Invalid study access code."
-        : "Teslim tamamlanamadı; yerel yanıtlarınız korunuyor. Yeniden deneyebilir veya bölüm JSON'unu indirebilirsiniz. · Submission failed; your local responses are safe.";
+      if (code === "INVALID_STUDY_ACCESS") {
+        status.textContent = "Çalışma erişim kodu geçersiz. · Invalid study access code.";
+      } else if (code === "NETWORK_SUBMISSION_LIMIT") {
+        status.textContent = "Bu ağdan bu bölüm için iki farklı gönderim sınırına ulaşıldı. Yerel yanıtlarınız korunuyor. · This network has reached the two-submission limit for this block.";
+      } else {
+        status.textContent = "Teslim tamamlanamadı; yerel yanıtlarınız korunuyor. Yeniden deneyebilir veya bölüm JSON'unu indirebilirsiniz. · Submission failed; your local responses are safe.";
+      }
       button.disabled = false;
     } finally {
       clearTimeout(timeout);

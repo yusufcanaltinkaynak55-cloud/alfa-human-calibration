@@ -29,7 +29,8 @@ const allowedPaths = new Set([
   "supabase/config.toml",
   "supabase/functions/submit-annotations/index.ts",
   "supabase/migrations/202607190001_create_human_annotation_submissions.sql",
-  "supabase/migrations/202607190002_expand_to_150_blocked.sql"
+  "supabase/migrations/202607190002_expand_to_150_blocked.sql",
+  "supabase/migrations/202607190003_add_private_network_limit.sql"
 ]);
 const forbiddenNames = new Set([
   ".env",
@@ -198,11 +199,33 @@ for (const required of [
   "INVALID_BLOCK",
   "BLOCK_SIZE = 50",
   "MASTER_BANK_SIZE = 150",
+  "NETWORK_SUBMISSION_LIMIT = 2",
+  "ALFA_IP_HASH_PEPPER",
+  "networkFingerprint",
+  "cf-connecting-ip",
+  "NETWORK_SUBMISSION_LIMIT",
+  "network_fingerprint",
   "PUBLIC-CALIBRATION-TR-EN-150-V1",
-  "ignoreDuplicates: true",
   "https://yusufcanaltinkaynak55-cloud.github.io"
 ]) {
   if (!functionSource.includes(required)) throw new Error(`Missing submission security contract: ${required}`);
+}
+const networkLimitMigrationSource = fs.readFileSync(
+  path.join(root, "supabase/migrations/202607190003_add_private_network_limit.sql"),
+  "utf8"
+);
+for (const required of [
+  "network_fingerprint text",
+  "network_slot smallint",
+  "public-calibration-v0.4.0",
+  "network_slot in (1, 2)",
+  "create unique index",
+  "HMAC-SHA256 network fingerprint",
+  "Raw IP is not stored"
+]) {
+  if (!networkLimitMigrationSource.toLowerCase().includes(required.toLowerCase())) {
+    throw new Error(`Missing private-network-limit database contract: ${required}`);
+  }
 }
 const initialMigrationSource = fs.readFileSync(
   path.join(root, "supabase/migrations/202607190001_create_human_annotation_submissions.sql"),

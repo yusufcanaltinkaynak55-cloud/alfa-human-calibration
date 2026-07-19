@@ -9,6 +9,8 @@ Public / Kamusal:
 - local pseudonymous JSON export / yerel takma adlı JSON dışa aktarımı
 - isolated submission contract, migration and endpoint source / yalıtılmış
   gönderim sözleşmesi, geçişi ve uç nokta kaynağı
+- disclosure of the secret-keyed network-fingerprint policy / gizli anahtarlı
+  ağ parmak izi politikasının açıklaması
 
 Private / Gizli:
 
@@ -19,6 +21,8 @@ Private / Gizli:
 - private development or test datasets / özel geliştirme ve test veri kümeleri
 - stored response rows and administrative tools / saklanan yanıt satırları ve
   yönetim araçları
+- raw IP addresses and the fingerprint secret / ham IP adresleri ve parmak izi
+  gizli değeri
 - credentials, environment files and internal history / kimlik bilgileri, ortam dosyaları ve dahili geçmiş
 
 This repository must be created independently. It must never be produced by

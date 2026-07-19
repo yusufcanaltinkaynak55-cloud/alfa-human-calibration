@@ -31,7 +31,7 @@
     {
       "path": "CITATION.cff",
       "bytes": 297,
-      "sha256": "1daaea12a02fb33ec1d85eb6e43bfb072fc0d56d0c6702b4d3a577935f079ba8"
+      "sha256": "c3342d3f65cd0a84625c0a81d6c7fba2cd7ed2680878efcac5879c5bdfadc93f"
     },
     {
       "path": "GITHUB_PUBLISH.md",
@@ -45,38 +45,38 @@
     },
     {
       "path": "METHOD.md",
-      "bytes": 2981,
-      "sha256": "eabfdc41483761407e0712e9808258ae6b9cedaa92bbe02fd058ac680bb64d51"
+      "bytes": 3514,
+      "sha256": "37c0096d844383cb7eee5b62fb3e7027be368e89b38ddbbe58d4ec483932a1e1"
     },
     {
       "path": "PRIVACY.md",
-      "bytes": 2690,
-      "sha256": "c38a36d5fa7ddeb99637e307adbf0b1891723a66081bcb83c6bab3beb073b890"
+      "bytes": 3457,
+      "sha256": "74097a9ec042df7d7a8b27bb6677b1fb13e283ef84c2bbf7fcaacd842dc5b8f2"
     },
     {
       "path": "PUBLICATION_BOUNDARY.md",
-      "bytes": 1459,
-      "sha256": "749dc2aaf59de0723323cf79faa0f8afd6b1f5a17305f0ae931af7d0bb0c0d3f"
+      "bytes": 1680,
+      "sha256": "478c0789c5c3939b37f9c10d575dab36f25bb5a8cac31f47a34754380dfa9bd1"
     },
     {
       "path": "README.md",
-      "bytes": 3040,
-      "sha256": "3e25cdb7f6ef208270fd8c4261b60134949e5d373c184abceb0f1dad38e71c84"
+      "bytes": 3491,
+      "sha256": "e1579f6969862b4b4e2f1ddca831eabd4afb90e05cec555946c8dca9f7d1f9b1"
     },
     {
       "path": "SUBMISSION_DEPLOYMENT.md",
-      "bytes": 2676,
-      "sha256": "c8cdd10b72392e1aa77446a2f940dceef9c163ce72472d5fe7c3fd5a88de9a35"
+      "bytes": 3466,
+      "sha256": "f67cd3a1503afcc05d0f87748b8de6f2a36bf65c0b4269e60d3b437d5314125e"
     },
     {
       "path": "app.js",
-      "bytes": 22395,
-      "sha256": "47c0ef6ba8f874ac97cd1919a1eb2ff173203b81f040a3888bb7514e8ba634cf"
+      "bytes": 22707,
+      "sha256": "473a21c6c9db0ad659d9c6052c45fac137a7555b27b9ff3427134e817a57464c"
     },
     {
       "path": "index.html",
-      "bytes": 12834,
-      "sha256": "015c1c46621ca9d4289b789c7deba7abb58b768dd27495064bab0fd0d9fdc446"
+      "bytes": 12931,
+      "sha256": "08e8897c095e1a1fca37e52d6e8eab52b1a8f7b5a50c96026849becca21d8a02"
     },
     {
       "path": "pilot-items.js",
@@ -85,13 +85,13 @@
     },
     {
       "path": "runtime-config.js",
-      "bytes": 269,
-      "sha256": "f8ef7e2296b625796090cb1e19780adc2280cc6b93bcebcc907ba79272bedeed"
+      "bytes": 274,
+      "sha256": "b78aa080548030213a2d07acf5c02bd52e0ac14f83c58b304016d622227efd31"
     },
     {
       "path": "scripts/verify-public-package.mjs",
-      "bytes": 8663,
-      "sha256": "59d92dd93a7db941488472512da16eccbe8c653595cf713c3744816e6efdd572"
+      "bytes": 9422,
+      "sha256": "7191deb2aed5621aad75c9d358b001966a73e6e69fe643f057226319d5731dcc"
     },
     {
       "path": "styles.css",
@@ -105,8 +105,8 @@
     },
     {
       "path": "supabase/functions/submit-annotations/index.ts",
-      "bytes": 10676,
-      "sha256": "9b9cd52eadfec8b53a53f7f7420c6776411f2c9c0a87e04d7c7290e250bef637"
+      "bytes": 13744,
+      "sha256": "3855b1ed9243c3d2aaae31ccf392b896602e4d44f2c7d12b8c7acfd5e0242b75"
     },
     {
       "path": "supabase/migrations/202607190001_create_human_annotation_submissions.sql",
@@ -117,6 +117,11 @@
       "path": "supabase/migrations/202607190002_expand_to_150_blocked.sql",
       "bytes": 1828,
       "sha256": "cddfaf0cfc8710b684856535174cc774ccb11f189e9834ef69cf6caeffe7fde9"
+    },
+    {
+      "path": "supabase/migrations/202607190003_add_private_network_limit.sql",
+      "bytes": 2250,
+      "sha256": "97b32cf44ba104ea27a899ffcde1df90e9e69b11f6d174f9fff35d6857f395ab"
     }
   ]
 }
