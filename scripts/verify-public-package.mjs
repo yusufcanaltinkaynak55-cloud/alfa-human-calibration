@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const allowedExtensions = new Set(["", ".html", ".css", ".js", ".mjs", ".md", ".cff", ".json", ".yml", ".toml", ".sql", ".ts"]);
 const allowedPaths = new Set([
+  ".gitattributes",
   ".github/workflows/public-boundary.yml",
   ".gitignore",
   ".nojekyll",
