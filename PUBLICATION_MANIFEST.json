@@ -9,6 +9,11 @@
   "containsStoredResponses": false,
   "files": [
     {
+      "path": ".gitattributes",
+      "bytes": 19,
+      "sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c"
+    },
+    {
       "path": ".github/workflows/public-boundary.yml",
       "bytes": 411,
       "sha256": "c51e61311b75cec62dfaee01ca7e07940e547f6c21e92da3c80cf393621fad06"
@@ -85,8 +90,8 @@
     },
     {
       "path": "scripts/verify-public-package.mjs",
-      "bytes": 6788,
-      "sha256": "5d8e1d090c49fc5e7eeff42e062b9d27d7f087ca5aa9b6e284771aa433d78782"
+      "bytes": 6808,
+      "sha256": "248cbf388a75d825c1b0db0daddca15d7cb4a754c8c32fe3edc982b155641e4a"
     },
     {
       "path": "styles.css",
