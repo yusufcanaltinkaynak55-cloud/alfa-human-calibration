@@ -12,6 +12,7 @@ const CONSENT_VERSION = "alfa_remote_submission_consent_v2";
 const MAX_BODY_BYTES = 128 * 1024;
 const BLOCK_SIZE = 50;
 const MASTER_BANK_SIZE = 150;
+const NETWORK_SUBMISSION_LIMIT = 2;
 const BLOCKS = new Map([
   ["BLOCK-01", { index: 1, first: 1, last: 50 }],
   ["BLOCK-02", { index: 2, first: 51, last: 100 }],
@@ -90,6 +91,51 @@ function constantTimeEqual(left: string, right: string) {
 
 function validIsoTimestamp(value: unknown) {
   return typeof value === "string" && value.length <= 40 && Number.isFinite(Date.parse(value));
+}
+
+function normalizeClientIp(value: string | null) {
+  if (!value) return "";
+  let candidate = value.trim().replace(/^\[|\]$/g, "");
+  if (candidate.toLowerCase().startsWith("::ffff:")) candidate = candidate.slice(7);
+  const ipv4 = candidate.split(".");
+  if (
+    ipv4.length === 4
+    && ipv4.every((part) => /^\d{1,3}$/.test(part) && Number(part) >= 0 && Number(part) <= 255)
+  ) {
+    return ipv4.map((part) => String(Number(part))).join(".");
+  }
+  candidate = candidate.split("%", 1)[0].toLowerCase();
+  if (candidate.includes(":") && /^[0-9a-f:]{2,45}$/.test(candidate)) return candidate;
+  return "";
+}
+
+function readClientIp(request: Request) {
+  const cloudflareIp = normalizeClientIp(request.headers.get("cf-connecting-ip"));
+  if (cloudflareIp) return cloudflareIp;
+  const forwarded = request.headers.get("x-forwarded-for");
+  if (forwarded) {
+    const candidates = forwarded.split(",").map((value) => normalizeClientIp(value)).filter(Boolean);
+    if (candidates.length) return candidates[candidates.length - 1];
+  }
+  return normalizeClientIp(request.headers.get("x-real-ip"));
+}
+
+async function networkFingerprint(ip: string, pepper: string) {
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(pepper),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const signature = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    new TextEncoder().encode(`${PACKAGE_ID}:${ip}`)
+  );
+  return [...new Uint8Array(signature)]
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 function validatePayload(value: unknown): { ok: true; payload: SubmissionPayload } | { ok: false; code: string } {
@@ -206,11 +252,35 @@ Deno.serve(async (request) => {
 
   const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
   const secretKey = readSecretKey();
-  if (!supabaseUrl || !secretKey) return jsonResponse(origin, 503, { ok: false, code: "DATABASE_NOT_CONFIGURED" });
+  const fingerprintPepper = Deno.env.get("ALFA_IP_HASH_PEPPER") || "";
+  if (!supabaseUrl || !secretKey || !fingerprintPepper) {
+    return jsonResponse(origin, 503, { ok: false, code: "DATABASE_NOT_CONFIGURED" });
+  }
+  const clientIp = readClientIp(request);
+  if (!clientIp) return jsonResponse(origin, 503, { ok: false, code: "NETWORK_IDENTITY_UNAVAILABLE" });
+  const fingerprint = await networkFingerprint(clientIp, fingerprintPepper);
   const supabase = createClient(supabaseUrl, secretKey, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
   });
   const payload = validation.payload;
+
+  const { data: existingSubmission, error: existingLookupError } = await supabase
+    .from("human_annotation_submissions")
+    .select("receipt_id, received_at")
+    .eq("submission_id", payload.submissionId)
+    .maybeSingle();
+  if (existingLookupError) {
+    console.error("submission_lookup_failed", existingLookupError.code);
+    return jsonResponse(origin, 500, { ok: false, code: "RECEIPT_LOOKUP_FAILED" });
+  }
+  if (existingSubmission) {
+    return jsonResponse(origin, 200, {
+      ok: true,
+      receiptId: existingSubmission.receipt_id,
+      receivedAt: existingSubmission.received_at
+    });
+  }
+
   const proposedReceipt = `ALFA-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
   const record = {
     submission_id: payload.submissionId,
@@ -228,35 +298,48 @@ Deno.serve(async (request) => {
     annotations: payload.annotations,
     client_consented_at: payload.consentedAt,
     client_submitted_at: payload.clientSubmittedAt,
-    source_version: "public-calibration-v0.3.0"
+    source_version: "public-calibration-v0.4.0",
+    network_fingerprint: fingerprint
   };
 
-  const { data: inserted, error: insertError } = await supabase
-    .from("human_annotation_submissions")
-    .upsert(record, { onConflict: "submission_id", ignoreDuplicates: true })
-    .select("receipt_id, received_at");
-  if (insertError) {
-    console.error("submission_insert_failed", insertError.code);
-    return jsonResponse(origin, 500, { ok: false, code: "DATABASE_WRITE_FAILED" });
-  }
-
-  let stored = inserted?.[0];
-  if (!stored) {
-    const { data: existing, error: lookupError } = await supabase
+  for (let networkSlot = 1; networkSlot <= NETWORK_SUBMISSION_LIMIT; networkSlot += 1) {
+    const { data: inserted, error: insertError } = await supabase
+      .from("human_annotation_submissions")
+      .insert({ ...record, network_slot: networkSlot })
+      .select("receipt_id, received_at");
+    if (!insertError && inserted?.[0]) {
+      return jsonResponse(origin, 200, {
+        ok: true,
+        receiptId: inserted[0].receipt_id,
+        receivedAt: inserted[0].received_at
+      });
+    }
+    if (insertError?.code !== "23505") {
+      console.error("submission_insert_failed", insertError?.code || "unknown");
+      return jsonResponse(origin, 500, { ok: false, code: "DATABASE_WRITE_FAILED" });
+    }
+    const { data: concurrentDuplicate, error: duplicateLookupError } = await supabase
       .from("human_annotation_submissions")
       .select("receipt_id, received_at")
       .eq("submission_id", payload.submissionId)
       .maybeSingle();
-    if (lookupError || !existing) {
-      console.error("submission_lookup_failed", lookupError?.code || "not_found");
+    if (duplicateLookupError) {
+      console.error("submission_lookup_failed", duplicateLookupError.code);
       return jsonResponse(origin, 500, { ok: false, code: "RECEIPT_LOOKUP_FAILED" });
     }
-    stored = existing;
+    if (concurrentDuplicate) {
+      return jsonResponse(origin, 200, {
+        ok: true,
+        receiptId: concurrentDuplicate.receipt_id,
+        receivedAt: concurrentDuplicate.received_at
+      });
+    }
   }
 
-  return jsonResponse(origin, 200, {
-    ok: true,
-    receiptId: stored.receipt_id,
-    receivedAt: stored.received_at
+  return jsonResponse(origin, 429, {
+    ok: false,
+    code: "NETWORK_SUBMISSION_LIMIT",
+    limit: NETWORK_SUBMISSION_LIMIT,
+    scope: "per_block"
   });
 });
